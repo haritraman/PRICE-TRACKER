@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Price Tracker</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; padding: 50px; }
+        input, button { padding: 10px; margin: 10px; }
+    </style>
+</head>
+<body>
+    <h1>Price Tracker</h1>
+    <p>Enter the product URL to track its price:</p>
+    <input type="text" id="productUrl" placeholder="Enter Amazon/Flipkart URL" size="50">
+    <button onclick="trackPrice()">Check Price</button>
+    <h3 id="result"></h3>
+    
+    <script>
+        function trackPrice() {
+            let url = document.getElementById("productUrl").value;
+            fetch(`/track?url=${encodeURIComponent(url)}`)
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById("result").innerText = `Product: ${data.title}\nPrice: ${data.price}`;
+                })
+                .catch(error => {
+                    document.getElementById("result").innerText = "Error fetching price.";
+                });
+        }
+    </script>
+</body>
+</html>
