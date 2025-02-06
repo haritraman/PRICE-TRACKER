@@ -29,14 +29,40 @@ def home():
 @app.route('/about')
 def about():
     return "This is the About page."
-@app.route('/track', methods=['GET'])
+@app.route('/track', methods=['GET','POST'])
 def track():
-    product_url = request.args.get("url")
-    if not product_url:
-        return jsonify({"error": "URL parameter is required"}), 400
+    if request.method=='POST':
+        product_url=request.form.get("url")
+        desired_price = request.form.get("desired_price")
+    else:
+        product_url = request.args.get("url")
+        desired_price = request.args.get("desired_price")
+
+    if not product_url or not desired_price:
+        return render_template("index.html",error= "Both URL and Desired Price are required"),400
+    
+    try:
+        desired_price = float(desired_price)  # Convert input to float
+    except ValueError:
+        return render_template("index.html",error="Invalid price format"),400
 
     data = get_price(product_url)
-    return jsonify(data)
+
+    if data["price"] == "N/A":
+        return render_template("index.html",error= "Could not fetch the price"),400
+    try:
+        current_price = float(data["price"].replace("₹", "").replace(",", "").strip())
+    except ValueError:
+        return render_template("index.html", error="Error parsing price"), 400  # Return a valid tuple
+    
+
+    # Check price condition
+    if current_price <= desired_price:
+        message = f"Good news! The price of '{data['title']}' has dropped to {current_price}!"
+    else:
+        message = f"Current price of '{data['title']}' is {current_price}. Waiting for {desired_price}."
+
+    return render_template("index.html",title=data["title"], current_price= current_price, desired_price= desired_price, message= message)
 
 if __name__ == '__main__':
     app.run(debug=True)
