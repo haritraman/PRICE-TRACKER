@@ -1,11 +1,28 @@
-from flask import Flask,render_template, request, jsonify
+from flask import Flask, render_template, request, redirect
 import requests
 from bs4 import BeautifulSoup
+from apscheduler.schedulers.background import BackgroundScheduler
 
 app = Flask(__name__)
 
+# Telegram Bot Details
+BOT_TOKEN = "7515179552:AAE9P-rVQaLqawrQHZyYIeMcCTJ0oj5YJ-A"
+CHAT_ID = "1804074852"
+
+# Store tracking details
+tracked_products = {}
+
+def send_telegram_message(message):
+    """Send a notification to Telegram."""
+    url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
+    params = {"chat_id": CHAT_ID, "text": message}
+    requests.post(url, params=params)
+
 def get_price(url):
-    headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 Safari/537.36"}
+    """Scrape price from Amazon or Flipkart."""
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 Safari/537.36"
+    }
     
     response = requests.get(url, headers=headers)
     soup = BeautifulSoup(response.content, 'html.parser')
@@ -23,46 +40,70 @@ def get_price(url):
         "title": title.get_text(strip=True) if title else "N/A",
         "price": price.get_text(strip=True) if price else "N/A"
     }
+
+def check_price():
+    """Check price every hour and send notification if price drops."""
+    for url, details in tracked_products.items():
+        data = get_price(url)
+        if data["price"] == "N/A":
+            continue  # Skip if price not found
+
+        try:
+            current_price = float(data["price"].replace("₹", "").replace(",", "").strip())
+        except ValueError:
+            continue  # Skip if price conversion fails
+
+        tracked_products[url]["current_price"] = current_price  # Update current price
+
+        # Check if current price is lower than or equal to desired price
+        if current_price <= details["desired_price"]:
+            message = f"🔥 Price Drop Alert! 🔥\n{data['title']}\nCurrent Price: ₹{current_price}\nBuy Now: {url}"
+            send_telegram_message(message)
+
 @app.route('/')
 def home():
-    return render_template('index.html')
-@app.route('/about')
-def about():
-    return "This is the About page."
-@app.route('/track', methods=['GET','POST'])
+    return render_template('index.html', tracked_products=tracked_products)
+
+@app.route('/track', methods=['POST'])
 def track():
-    if request.method=='POST':
-        product_url=request.form.get("url")
-        desired_price = request.form.get("desired_price")
-    else:
-        product_url = request.args.get("url")
-        desired_price = request.args.get("desired_price")
+    """Track a new product."""
+    product_url = request.form.get("url")
+    desired_price = request.form.get("desired_price")
 
     if not product_url or not desired_price:
-        return render_template("index.html",error= "Both URL and Desired Price are required"),400
+        return render_template("index.html", error="Both URL and Desired Price are required", tracked_products=tracked_products), 400
     
     try:
-        desired_price = float(desired_price)  # Convert input to float
+        desired_price = float(desired_price)
     except ValueError:
-        return render_template("index.html",error="Invalid price format"),400
+        return render_template("index.html", error="Invalid price format", tracked_products=tracked_products), 400
 
-    data = get_price(product_url)
+    # Get initial product details
+    product_data = get_price(product_url)
+    if "error" in product_data:
+        return render_template("index.html", error="Unsupported website", tracked_products=tracked_products), 400
 
-    if data["price"] == "N/A":
-        return render_template("index.html",error= "Could not fetch the price"),400
-    try:
-        current_price = float(data["price"].replace("₹", "").replace(",", "").strip())
-    except ValueError:
-        return render_template("index.html", error="Error parsing price"), 400  # Return a valid tuple
-    
+    tracked_products[product_url] = {
+        "title": product_data["title"],
+        "desired_price": desired_price,
+        "current_price": product_data["price"]
+    }
+    check_price()
 
-    # Check price condition
-    if current_price <= desired_price:
-        message = f"Good news! The price of '{data['title']}' has dropped to {current_price}!"
-    else:
-        message = f"Current price of '{data['title']}' is {current_price}. Waiting for {desired_price}."
+    return redirect('/')
 
-    return render_template("index.html",title=data["title"], current_price= current_price, desired_price= desired_price, message= message)
+@app.route('/remove', methods=['POST'])
+def remove():
+    """Remove a tracked product."""
+    product_url = request.form.get("url")
+    if product_url in tracked_products:
+        del tracked_products[product_url]
+    return redirect('/')
+
+# Scheduler to check prices every hour
+scheduler = BackgroundScheduler()
+scheduler.add_job(check_price, 'interval', hours=1)
+scheduler.start()
 
 if __name__ == '__main__':
     app.run(debug=True)
