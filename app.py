@@ -62,12 +62,26 @@ def check_price():
         except ValueError:
             continue  # Skip if price conversion fails
 
-        tracked_products[url]["current_price"] = current_price  # Update current price
+        # Get previous price and ensure it's a float
+        previous_price = details.get("current_price")
+        if previous_price is not None:
+            try:
+                previous_price = float(previous_price)
+            except ValueError:
+                previous_price = None  # Reset if conversion fails
 
-        # Check if current price is lower than or equal to desired price
+            # Check if current price is lower than or equal to desired price
         if current_price <= details["desired_price"]:
             message = f"🔥 Price Drop Alert! 🔥\n{data['title']}\nCurrent Price: ₹{current_price}\nBuy Now: {url}"
             send_telegram_message(message)
+         # Ensure previous price exists before checking for a decrease
+        
+        if previous_price is not None and current_price < previous_price:
+            message = f"🔥 Price Decreased! 🔥\n{data['title']} from ₹{previous_price} to ₹{current_price}\nBuy Now: {url}"
+            send_telegram_message(message)
+        tracked_products[url]["current_price"] = current_price  # Update current price
+
+
 
 @app.route('/')
 def home():
@@ -111,7 +125,7 @@ def remove():
 
 # Scheduler to check prices every hour
 scheduler = BackgroundScheduler()
-scheduler.add_job(check_price, 'interval', minutes=30)
+scheduler.add_job(check_price, 'interval', minutes=1)
 scheduler.start()
 
 if __name__ == '__main__':
