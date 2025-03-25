@@ -5,40 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Price Tracker</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            margin: 50px;
-        }
-        form {
-            margin-bottom: 20px;
-        }
-        input {
-            padding: 10px;
-            margin: 5px;
-            width: 250px;
-        }
-        button {
-            padding: 10px 20px;
-            background-color: blue;
-            color: white;
-            border: none;
-            cursor: pointer;
-        }
-        .result, .tracked {
-            margin-top: 20px;
-            padding: 20px;
-            border: 1px solid #ddd;
-            display: inline-block;
-            background: #f9f9f9;
-        }
-        .error {
-            color: red;
-        }
+        body { font-family: Arial, sans-serif; text-align: center; margin: 50px; }
+        form { margin-bottom: 20px; }
+        input { padding: 10px; margin: 5px; width: 250px; }
+        button { padding: 10px 20px; background-color: blue; color: white; border: none; cursor: pointer; }
+        .tracked { margin-top: 20px; padding: 20px; border: 1px solid #ddd; background: #f9f9f9; display: inline-block; }
+        .error { color: red; }
     </style>
 </head>
 <body>
-    <h2>Price Tracker</h2>
+    <h2>Welcome, {{ session['username'] }}</h2>
+    <a href="/logout">Logout</a>
+
+    <h2>Track a New Product</h2>
     <form action="/track" method="post">
         <input type="text" name="url" placeholder="Enter Product URL" required>
         <input type="number" step="0.01" name="desired_price" placeholder="Enter Desired Price" required>
@@ -47,12 +26,6 @@
 
     {% if error %}
         <p class="error">{{ error }}</p>
-    {% endif %}
-
-    {% if message %}
-        <div class="result">
-            <p><strong>Status:</strong> {{ message }}</p>
-        </div>
     {% endif %}
 
     <h3>Currently Tracked Products</h3>
