@@ -1,0 +1,6 @@
+Flask
+Flask-Mail
+Flask-Session
+gunicorn
+requests
+python-dotenv
