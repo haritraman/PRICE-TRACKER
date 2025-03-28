@@ -1,6 +1,15 @@
 Flask
+requests
 Flask-Mail
 Flask-Session
 gunicorn
 requests
+beautifulsoup4
+apscheduler
+werkzeug
 python-dotenv
+
+
+
+
+
