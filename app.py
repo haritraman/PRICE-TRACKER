@@ -54,6 +54,7 @@ def load_users():
 #load_users()
 
 def send_telegram_message(chat_id, message):
+    print(f"Sending Telegram alert to {chat_id}: {message}")  # Debugging
     url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
     params = {"chat_id": chat_id, "text": message}
     response=requests.post(url, params=params)
