@@ -229,8 +229,16 @@ def logout():
 def home():
     if 'username' not in session:
         return redirect('/login')  # Redirect to login if not authenticated
+
     username = session['username']
+    
+    # Check if user exists in users
+    if username not in users:
+        session.pop('username', None)  # Remove invalid session
+        return redirect('/login')  # Redirect to login
+
     return render_template('index.html', tracked_products=users[username]['products'])
+
   # Save updated price data
 @app.route('/track', methods=['POST'])
 def track():
