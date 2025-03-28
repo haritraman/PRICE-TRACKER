@@ -6,8 +6,29 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from werkzeug.security import generate_password_hash, check_password_hash
 from dotenv import load_dotenv
 import os
+import smtplib  
+from email.mime.text import MIMEText  
+from email.mime.multipart import MIMEMultipart  
+ 
+
+
+from flask_mail import Mail, Message
+import random
 load_dotenv()
 app = Flask(__name__)
+app.config['MAIL_SERVER'] = 'smtp.gmail.com'  # Change if using another provider
+app.config['MAIL_PORT'] = 587
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USERNAME'] = os.getenv("EMAIL_USER")  # Your email
+app.config['MAIL_PASSWORD'] = os.getenv("EMAIL_PASS")  # Your email password
+app.config['MAIL_DEFAULT_SENDER'] = os.getenv("EMAIL_USER")
+
+mail = Mail(app)
+otp_store = {}  # Temporary storage for OTPs
+
+
+
+
 
 app.secret_key = os.getenv("SECRET_KEY", "fallback_secret_key")
 BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
@@ -112,20 +133,74 @@ def register():
         username = request.form['username']
         password = request.form['password']
         chat_id = request.form['chat_id']
-    
+        email = request.form['email']
 
         if username in users:
             return "User already exists! Try another username."
+        
+        otp = str(random.randint(100000, 999999))
+        otp_store[email] = otp  # Store OTP temporarily
 
-        users[username] = {
+        # Store user temporarily before confirmation
+        session['pending_user'] = {
+            "username": username,
             "password": generate_password_hash(password),
             "chat_id": chat_id,
-            "products": {}
+            "email": email
         }
-        save_users()
-        return redirect('/login')
+
+        # Send OTP email
+        msg = Message("Your OTP Code", sender=app.config['MAIL_USERNAME'], recipients=[email])
+        msg.body = f"Your OTP code is: {otp}. It is valid for 5 minutes."
+        print("Recipients:", msg.recipients)
+        print("Sender:", msg.sender)
+
+
+        try:
+            mail.send(msg)
+            print(f"OTP sent to: {email}")  # Debugging print
+            return redirect('/verify_otp')
+        except Exception as e:  # Catch all exceptions
+            print(f"Error sending email: {e}")  # Debugging print
+            return f"Error sending email: {e}", 500
+
     
     return render_template('register.html')
+    #     users[username] = {
+    #         "password": generate_password_hash(password),
+    #         "chat_id": chat_id,
+    #         "products": {}
+    #     }
+    #     save_users()
+    #     return redirect('/login')
+    
+    # return render_template('register.html')
+@app.route('/verify_otp', methods=['GET', 'POST'])
+def verify_otp():
+    if request.method == 'POST':
+        email = session.get('pending_user', {}).get('email')
+        user_otp = request.form.get('otp')
+
+        if not email or email not in otp_store or otp_store[email] != user_otp:
+            return "Invalid OTP!", 400
+
+        user_data = session.pop('pending_user', None)  
+        if not user_data:
+            return "Session expired. Please register again.", 400
+
+        users[user_data['username']] = {
+            "password": user_data['password'],
+            "chat_id": user_data['chat_id'],
+            "email": user_data['email'],
+            "products": {}
+        }
+
+        del otp_store[email]
+
+        return redirect('/login')
+
+    return render_template('verify.html')
+
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -203,4 +278,4 @@ scheduler.start()
 
 
 if __name__ == '__main__':
-    app.run(threaded=True)
+    app.run(debug=True)
