@@ -265,11 +265,14 @@ def track():
     if "error" in product_data:
         return "Unsupported website", 400
     
+    if username not in users:
+        return "User not found", 400
     users[username]['products'][product_url] = {
         "title": product_data["title"],
         "desired_price": desired_price,
         "current_price": product_data["price"]
     }
+    print(f"Saving product for {username}: {users[username]['products']}")
     save_users()
     return redirect('/')
 
