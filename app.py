@@ -308,6 +308,13 @@ def test_scheduler():
     check_price()  # Run price checking manually
     return "Price check executed!"
 
+from threading import Thread
+
+def run_scheduler():
+    scheduler.start()
+
+t = Thread(target=run_scheduler)
+t.start()
 
 
 if __name__ == '__main__':
