@@ -6,6 +6,7 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from werkzeug.security import generate_password_hash, check_password_hash
 from dotenv import load_dotenv
 import os
+import atexit
 import smtplib  
 from email.mime.text import MIMEText  
 from email.mime.multipart import MIMEMultipart  
@@ -293,13 +294,20 @@ def remove():
 # scheduler.add_job(check_price, 'interval', minutes=1)  # Runs every hour
 # scheduler.start()
 scheduler = BackgroundScheduler()
-scheduler.add_job(check_price, 'interval', minutes=1)  # Runs every hour
+scheduler.add_job(check_price, 'interval', minutes=1)  # Runs every min
 scheduler.start()
+atexit.register(lambda: scheduler.shutdown())
+print("Starting APScheduler...")
 @app.before_request
 def start_scheduler():
-    if not scheduler.running:  # If the scheduler is not already running
-        print("Starting APScheduler...")
+    if not scheduler.get_jobs():  # If no jobs are running
+        print("Starting APScheduler again...")
         scheduler.start()
+@app.route('/test_scheduler')
+def test_scheduler():
+    check_price()  # Run price checking manually
+    return "Price check executed!"
+
 
 
 if __name__ == '__main__':
