@@ -99,6 +99,7 @@ def check_price():
     # load_users()  # Reload user data in case of updates
 
     for username, user_data in users.items():
+    
         print(f"Checking for user: {username}")  # Debug log
         chat_id = user_data.get("chat_id")
         if not chat_id:
