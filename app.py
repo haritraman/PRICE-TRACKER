@@ -59,7 +59,11 @@ def send_telegram_message(chat_id, message):
     params = {"chat_id": chat_id, "text": message}
     response=requests.post(url, params=params)
     #print("Telegram API response: ",response.json())
-
+@app.before_request
+def start_scheduler():
+    if not scheduler.running:  # If the scheduler is not already running
+        print("Starting APScheduler...")
+        scheduler.start()
 def get_price(url):
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 Safari/537.36"
