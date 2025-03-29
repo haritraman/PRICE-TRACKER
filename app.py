@@ -79,8 +79,8 @@ def get_price(url):
             price = soup.find('div', {'class': '_30jeq3 _16Jk6d'})
         else:
             return {"error": "Unsupported website"}
-        print(f"Extracted Title: {title_text}")
-        print(f"Extracted Price: {price_text}")
+        print(f"Extracted Title: {title}")
+        print(f"Extracted Price: {price}")
 
         return {
             "title": title.get_text(strip=True) if title else "Title Not Found",
