@@ -70,8 +70,8 @@ def get_price(url):
 
     try:
         response = requests.get(url, headers=headers)
-        print(f"Response Status: {response.status_code}")
-        print(f"Response Text: {response.text[:500]}")  # Print first 500 characters for debugging
+        #print(f"Response Status: {response.status_code}")
+        #print(f"Response Text: {response.text[:500]}")  # Print first 500 characters for debugging
         soup = BeautifulSoup(response.content, 'html.parser')
 
         if 'amazon' in url:
@@ -82,8 +82,10 @@ def get_price(url):
             price = soup.find('div', {'class': '_30jeq3 _16Jk6d'})
         else:
             return {"error": "Unsupported website"}
-        print(f"Extracted Title: {title}")
-        print(f"Extracted Price: {price}")
+        #print(f"Extracted Title: {title}")
+        #print(f"Extracted Price: {price}")
+
+
 
         return {
             "title": title.get_text(strip=True) if title else "Title Not Found",
@@ -290,36 +292,10 @@ def remove():
         save_users()
     
     return redirect('/')
-# scheduler = BackgroundScheduler()
-# scheduler.add_job(check_price, 'interval', minutes=1)  # Runs every hour
-# scheduler.start()
-
-  # Runs every min
-
-# atexit.register(lambda: scheduler.shutdown())
-
-# @app.before_request
-# def start_scheduler():
-#     if not scheduler.get_jobs():  # If no jobs are running
-#         print("Starting APScheduler again...")
-#         scheduler.start()
-
 scheduler = BackgroundScheduler()
-scheduler.add_job(check_price, 'interval', minutes=1, id="price_check", replace_existing=True)
-@app.route('/test_scheduler')
-def test_scheduler():
-    check_price()  # Run price checking manually
-    print("Starting APScheduler...")
+
+if not scheduler.running:  # Ensure it's not already running
+    scheduler.add_job(check_price, 'interval', minutes=1)
     scheduler.start()
-    return redirect('/')
-
-# from threading import Thread
-
-# def run_scheduler():
-#     scheduler.start()
-
-# t = Thread(target=run_scheduler)
-# t.start()
-
 if __name__ == '__main__':
     app.run(debug=True)
