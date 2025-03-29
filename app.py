@@ -95,9 +95,7 @@ def get_price(url):
         return {"error": "Request failed"}
 
 def check_price():
-     print(f"Checking prices at {datetime.datetime.now()}")  # Debug log
-    # load_users()  # Reload user data in case of updates
-
+    print(f"Checking prices at {datetime.datetime.now()}")
     for username, user_data in users.items():
     
         print(f"Checking for user: {username}")  # Debug log
