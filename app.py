@@ -71,7 +71,7 @@ def get_price(url):
         print(f"Response Text: {response.text[:500]}")  # Print first 500 characters for debugging
         soup = BeautifulSoup(response.content, 'html.parser')
 
-        if 'amazon' in url:
+        if 'amazn' in url:
             title = soup.find(id='productTitle')
             price = soup.find('span', {'class': 'a-offscreen'})
         elif 'flipkart' in url:
