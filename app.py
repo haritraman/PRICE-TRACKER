@@ -276,7 +276,7 @@ def track():
     }
     print(f"Saving product for {username}: {users[username]['products']}")
     save_users()
-    return redirect('/test_scheduler')
+    return redirect('/')
 
 @app.route('/remove', methods=['POST'])
 def remove():
@@ -311,8 +311,9 @@ def test_scheduler():
     check_price()  # Run price checking manually
     print("Starting APScheduler...")
     scheduler.start()
+    return redirect('/')
 
-#from threading import Thread
+# from threading import Thread
 
 # def run_scheduler():
 #     scheduler.start()
