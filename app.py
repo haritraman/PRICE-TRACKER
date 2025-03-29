@@ -23,6 +23,7 @@ app.config['MAIL_USERNAME'] = os.getenv("EMAIL_USER")  # Your email
 app.config['MAIL_PASSWORD'] = os.getenv("EMAIL_PASS")  # Your email password
 app.config['MAIL_DEFAULT_SENDER'] = os.getenv("EMAIL_USER")
 
+
 mail = Mail(app)
 otp_store = {}  # Temporary storage for OTPs
 
@@ -59,11 +60,7 @@ def send_telegram_message(chat_id, message):
     params = {"chat_id": chat_id, "text": message}
     response=requests.post(url, params=params)
     #print("Telegram API response: ",response.json())
-@app.before_request
-def start_scheduler():
-    if not scheduler.running:  # If the scheduler is not already running
-        print("Starting APScheduler...")
-        scheduler.start()
+
 def get_price(url):
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 Safari/537.36"
@@ -292,9 +289,17 @@ def remove():
         save_users()
     
     return redirect('/')
+# scheduler = BackgroundScheduler()
+# scheduler.add_job(check_price, 'interval', minutes=1)  # Runs every hour
+# scheduler.start()
 scheduler = BackgroundScheduler()
 scheduler.add_job(check_price, 'interval', minutes=1)  # Runs every hour
 scheduler.start()
+@app.before_request
+def start_scheduler():
+    if not scheduler.running:  # If the scheduler is not already running
+        print("Starting APScheduler...")
+        scheduler.start()
 
 
 if __name__ == '__main__':
