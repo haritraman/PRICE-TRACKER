@@ -298,11 +298,11 @@ scheduler.add_job(check_price, 'interval', minutes=1)  # Runs every min
 scheduler.start()
 atexit.register(lambda: scheduler.shutdown())
 print("Starting APScheduler...")
-@app.before_request
-def start_scheduler():
-    if not scheduler.get_jobs():  # If no jobs are running
-        print("Starting APScheduler again...")
-        scheduler.start()
+# @app.before_request
+# def start_scheduler():
+#     if not scheduler.get_jobs():  # If no jobs are running
+#         print("Starting APScheduler again...")
+#         scheduler.start()
 @app.route('/test_scheduler')
 def test_scheduler():
     check_price()  # Run price checking manually
