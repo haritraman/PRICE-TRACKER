@@ -7,6 +7,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from dotenv import load_dotenv
 import os
 import atexit
+import datetime
 import smtplib  
 from email.mime.text import MIMEText  
 from email.mime.multipart import MIMEMultipart  
@@ -94,7 +95,7 @@ def get_price(url):
         return {"error": "Request failed"}
 
 def check_price():
-    print("Checking prices...")  # Debug log
+     print(f"Checking prices at {datetime.datetime.now()}")  # Debug log
     # load_users()  # Reload user data in case of updates
 
     for username, user_data in users.items():
@@ -293,29 +294,32 @@ def remove():
 # scheduler = BackgroundScheduler()
 # scheduler.add_job(check_price, 'interval', minutes=1)  # Runs every hour
 # scheduler.start()
-scheduler = BackgroundScheduler()
-scheduler.add_job(check_price, 'interval', minutes=1)  # Runs every min
-scheduler.start()
-atexit.register(lambda: scheduler.shutdown())
-print("Starting APScheduler...")
+
+  # Runs every min
+
+# atexit.register(lambda: scheduler.shutdown())
+
 # @app.before_request
 # def start_scheduler():
 #     if not scheduler.get_jobs():  # If no jobs are running
 #         print("Starting APScheduler again...")
 #         scheduler.start()
+
+scheduler = BackgroundScheduler()
+scheduler.add_job(check_price, 'interval', minutes=1, id="price_check", replace_existing=True)
 @app.route('/test_scheduler')
 def test_scheduler():
     check_price()  # Run price checking manually
-    return "Price check executed!"
-
-from threading import Thread
-
-def run_scheduler():
+    print("Starting APScheduler...")
     scheduler.start()
 
-t = Thread(target=run_scheduler)
-t.start()
+#from threading import Thread
 
+# def run_scheduler():
+#     scheduler.start()
+
+# t = Thread(target=run_scheduler)
+# t.start()
 
 if __name__ == '__main__':
     app.run(debug=True)
