@@ -67,6 +67,8 @@ def get_price(url):
 
     try:
         response = requests.get(url, headers=headers)
+        print(f"Response Status: {response.status_code}")
+        print(f"Response Text: {response.text[:500]}")  # Print first 500 characters for debugging
         soup = BeautifulSoup(response.content, 'html.parser')
 
         if 'amazon' in url:
@@ -77,6 +79,8 @@ def get_price(url):
             price = soup.find('div', {'class': '_30jeq3 _16Jk6d'})
         else:
             return {"error": "Unsupported website"}
+        print(f"Extracted Title: {title_text}")
+        print(f"Extracted Price: {price_text}")
 
         return {
             "title": title.get_text(strip=True) if title else "Title Not Found",
