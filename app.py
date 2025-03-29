@@ -276,7 +276,7 @@ def track():
     }
     print(f"Saving product for {username}: {users[username]['products']}")
     save_users()
-    return redirect('/')
+    return redirect('/test_scheduler')
 
 @app.route('/remove', methods=['POST'])
 def remove():
