@@ -123,7 +123,7 @@ def check_price():
                 print(f"Invalid price format for {product['title']}, skipping.")
                 continue
 
-            if true: #current_price <= float(desired_price):
+            if True: #current_price <= float(desired_price):
                 message = f"Price Alert! {product['title']} is now {new_price_data['price']} (Target: ₹{desired_price})\n{url}"
                 # print(f"Checking price for {url}: Current {current_price}, Desired {desired_price}")
                 print(f"Chat ID for {username}: {chat_id}")
