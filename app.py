@@ -279,6 +279,13 @@ def track():
     print(f"Saving product for {username}: {users[username]['products']}")
     save_users()
     return redirect('/')
+###############################################################
+#############################################################
+@app.route('/test_scheduler')
+def test_scheduler():
+    check_price()
+    return "Manual price check triggered!"
+
 
 @app.route('/remove', methods=['POST'])
 def remove():
