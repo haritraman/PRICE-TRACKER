@@ -4,14 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Price Tracker</title>
-    <style>
-        body { font-family: Arial, sans-serif; text-align: center; margin: 50px; }
-        form { margin-bottom: 20px; }
-        input { padding: 10px; margin: 5px; width: 250px; }
-        button { padding: 10px 20px; background-color: blue; color: white; border: none; cursor: pointer; }
-        .tracked { margin-top: 20px; padding: 20px; border: 1px solid #ddd; background: #f9f9f9; display: inline-block; }
-        .error { color: red; }
-    </style>
+    
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
+
+
 </head>
 <body>
     <h2>Welcome, {{ session['username'] }}</h2>

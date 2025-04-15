@@ -1,0 +1,83 @@
+body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f2f4f8;
+      margin: 0;
+      padding: 0;
+      text-align: center;
+    }
+    
+    h2, h3 {
+      color: #333;
+      margin-top: 30px;
+    }
+    
+    a {
+      text-decoration: none;
+      color: #007bff;
+      font-weight: bold;
+      margin-top: 10px;
+      display: inline-block;
+    }
+    
+    form {
+      margin: 20px auto;
+      padding: 20px;
+      background: #ffffff;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      max-width: 400px;
+    }
+    
+    input {
+      display: block;
+      width: 90%;
+      padding: 10px;
+      margin: 10px auto;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-size: 16px;
+    }
+    
+    button {
+      padding: 10px 20px;
+      background-color: #28a745;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+      margin-top: 10px;
+      transition: background-color 0.3s ease;
+    }
+    
+    button:hover {
+      background-color: #218838;
+    }
+    
+    .error {
+      color: red;
+      margin-top: 10px;
+    }
+    
+    .tracked {
+      margin: 20px auto;
+      padding: 20px;
+      background: #ffffff;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      max-width: 600px;
+      text-align: left;
+    }
+    
+    .tracked ul {
+      list-style-type: none;
+      padding: 0;
+      margin: 0;
+    }
+    
+    .tracked li {
+      margin-bottom: 20px;
+      border-bottom: 1px solid #eee;
+      padding-bottom: 10px;
+    }
+    

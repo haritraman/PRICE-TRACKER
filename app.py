@@ -18,11 +18,11 @@ from flask_mail import Mail, Message
 import random
 load_dotenv()
 app = Flask(__name__)
-app.config['MAIL_SERVER'] = 'smtp.gmail.com'  # Change if using another provider
+app.config['MAIL_SERVER'] = 'smtp.gmail.com'  
 app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
-app.config['MAIL_USERNAME'] = os.getenv("EMAIL_USER")  # Your email
-app.config['MAIL_PASSWORD'] = os.getenv("EMAIL_PASS")  # Your email password
+app.config['MAIL_USERNAME'] = os.getenv("EMAIL_USER")  
+app.config['MAIL_PASSWORD'] = os.getenv("EMAIL_PASS") 
 app.config['MAIL_DEFAULT_SENDER'] = os.getenv("EMAIL_USER")
 
 
