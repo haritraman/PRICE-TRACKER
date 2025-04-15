@@ -16,5 +16,10 @@
             Don't have an account? <a href="/register">Register here</a>
         </div>
     </div>
+    {% if error %}
+    <script>
+        alert("{{ error }}");
+    </script>
+    {% endif %}
 </body>
 </html>

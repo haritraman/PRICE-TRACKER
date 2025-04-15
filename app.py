@@ -218,6 +218,7 @@ def login():
         password = request.form['password']
 
         if username not in users or not check_password_hash(users[username]['password'], password):
+            
             return render_template('login.html', error="Invalid username or password!")
 
         session['username'] = username
